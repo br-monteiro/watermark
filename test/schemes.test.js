@@ -1,6 +1,7 @@
 const assert = require('assert')
 const { validator } = require('../src/validator')
 const inputSchema = require('../src/validator/schemes/input.json')
+const requestSchema = require('../src/validator/schemes/request.json')
 
 describe('JSON Schemes', () => {
   const schemes = {}
@@ -26,9 +27,22 @@ describe('JSON Schemes', () => {
         width: 150
       }
     }
+
+    schemes.requestSchema = [
+      {
+        justTest: true
+      },
+      {
+        justTest: true
+      }
+    ]
   })
 
   it('validate the "input.json" schema', () => {
     assert.equal(true, validator.validate(schemes.inputSchema, inputSchema))
+  })
+
+  it('validate the "request.json" schema', () => {
+    assert.equal(true, validator.validate(schemes.requestSchema, requestSchema))
   })
 })
