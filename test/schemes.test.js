@@ -6,7 +6,7 @@ describe('JSON Schemes', () => {
   const schemes = {}
 
   beforeEach(() => {
-    schemes.inputSchema = [{
+    schemes.inputSchema = {
       id: '199299',
       groupId: '63773',
       feedbackUrl: 'https://teste.com',
@@ -25,7 +25,7 @@ describe('JSON Schemes', () => {
         height: 80,
         width: 150
       }
-    }]
+    }
   })
 
   it('validate the "input.json" schema', () => {
