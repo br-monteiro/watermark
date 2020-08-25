@@ -1,0 +1,41 @@
+{
+  "name": "watermark",
+  "version": "1.0.0",
+  "description": "Watermark lib",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/**/*.test.js",
+    "watch:test": "npm run test -- --watch",
+    "lint": "./node_modules/.bin/eslint src/**/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/br-monteiro/watermark.git"
+  },
+  "keywords": [
+    "image",
+    "watermark"
+  ],
+  "author": "Edson B S Monteiro <bruno.monteirodg@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/br-monteiro/watermark/issues"
+  },
+  "homepage": "https://github.com/br-monteiro/watermark#readme",
+  "devDependencies": {
+    "eslint": "^7.7.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "mocha": "^8.1.1"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "jsonschema": "^1.2.6"
+  }
+}
