@@ -1,0 +1,71 @@
+{
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["id", "groupId", "feedbackUrl", "watermarkOptions", "position"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "minLength": 3
+      },
+      "groupId": {
+        "type": "string",
+        "minLength": 3
+      },
+      "feedbackUrl": {
+        "type": "string",
+        "pattern": "^https?:\\/{2}.+$"
+      },
+      "watermarkOptions": {
+        "type": "object",
+        "required": ["type", "textOption"],
+        "properties": {
+          "type": {
+            "enum": ["text", "image"]
+          },
+          "textOption": {
+            "type": "object",
+            "required": ["text", "fontSize", "color"],
+            "properties": {
+              "text": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 100
+              },
+              "fontSize": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "color": {
+                "type": "string",
+                "pattern": "^#[A-F0-9]{6}$"
+              }
+            }
+          }
+        }
+      },
+      "position": {
+        "type": "object",
+        "required": ["x", "y", "height", "width"],
+        "properties": {
+          "x": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "y": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "height": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "width": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  }
+}
