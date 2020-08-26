@@ -10,10 +10,11 @@ describe('JSON Schemes', () => {
     schemes.inputSchema = {
       id: '199299',
       groupId: '63773',
+      imageId: '63773',
       feedbackUrl: 'https://teste.com',
       watermarkOptions: {
         type: 'text',
-        textOption: {
+        textOptions: {
           // eslint-disable-next-line quotes
           text: "Artes UP\n91 98888-8888",
           fontSize: 15,
