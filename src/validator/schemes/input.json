@@ -1,6 +1,6 @@
 {
   "type": "object",
-  "required": ["id", "groupId", "feedbackUrl", "watermarkOptions", "position"],
+  "required": ["id", "groupId", "imageId", "feedbackUrl", "watermarkOptions", "position"],
   "properties": {
     "id": {
       "type": "string",
@@ -10,18 +10,22 @@
       "type": "string",
       "minLength": 3
     },
+    "imageId": {
+      "type": "string",
+      "minLength": 3
+    },
     "feedbackUrl": {
       "type": "string",
       "pattern": "^https?:\\/{2}.+$"
     },
     "watermarkOptions": {
       "type": "object",
-      "required": ["type", "textOption"],
+      "required": ["type", "textOptions"],
       "properties": {
         "type": {
           "enum": ["text", "image"]
         },
-        "textOption": {
+        "textOptions": {
           "type": "object",
           "required": ["text", "fontSize", "color"],
           "properties": {
