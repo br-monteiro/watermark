@@ -1,5 +1,5 @@
 const assert = require('assert')
-const utils = require('../src/utils')
+const utils = require('./index')
 
 describe('Utils functions', () => {
   it('safeArray', () => {

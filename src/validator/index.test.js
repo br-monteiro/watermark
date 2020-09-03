@@ -1,5 +1,5 @@
 const assert = require('assert')
-const { validator } = require('../src/validator')
+const { validator } = require('./index')
 
 describe('ValidatorSchema', () => {
   let schema = {}
