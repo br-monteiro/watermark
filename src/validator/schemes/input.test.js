@@ -8,18 +8,8 @@ describe('JSON Schemes - input', () => {
   beforeEach(() => {
     data = {
       id: '199299',
-      groupId: '63773',
-      imageId: '63773',
       feedbackUrl: 'https://teste.com',
-      watermarkOptions: {
-        type: 'text',
-        textOptions: {
-          // eslint-disable-next-line quotes
-          text: "Artes UP\n91 98888-8888",
-          fontSize: 15,
-          color: '#AAF122'
-        }
-      },
+      baseImagePath: 'https://teste.com/',
       position: {
         x: 370,
         y: 470,
@@ -29,7 +19,28 @@ describe('JSON Schemes - input', () => {
     }
   })
 
-  it('validate the "input.json" schema', () => {
+  it('type text', () => {
+    data.watermarkOptions = {
+      type: 'text',
+      textOptions: {
+        // eslint-disable-next-line quotes
+        text: "Artes UP\n91 98888-8888",
+        fontSize: 15,
+        color: '#AAF122'
+      }
+    }
+
+    assert.equal(true, validator.validate(data, schema))
+  })
+
+  it('type image', () => {
+    data.watermarkOptions = {
+      type: 'image',
+      imageOptions: {
+        path: 'https://teste.com/'
+      }
+    }
+
     assert.equal(true, validator.validate(data, schema))
   })
 })

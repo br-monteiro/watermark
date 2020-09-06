@@ -1,18 +1,14 @@
 {
   "type": "object",
-  "required": ["id", "groupId", "imageId", "feedbackUrl", "watermarkOptions", "position"],
+  "required": ["id", "baseImagePath", "feedbackUrl", "watermarkOptions", "position"],
   "properties": {
     "id": {
       "type": "string",
       "minLength": 3
     },
-    "groupId": {
+    "baseImagePath": {
       "type": "string",
-      "minLength": 3
-    },
-    "imageId": {
-      "type": "string",
-      "minLength": 3
+      "pattern": "^https?:\\/{2}.+$"
     },
     "feedbackUrl": {
       "type": "string",
@@ -20,7 +16,7 @@
     },
     "watermarkOptions": {
       "type": "object",
-      "required": ["type", "textOptions"],
+      "required": ["type"],
       "properties": {
         "type": {
           "enum": ["text", "image"]
@@ -41,6 +37,16 @@
             "color": {
               "type": "string",
               "pattern": "^#[A-F0-9]{6}$"
+            }
+          }
+        },
+        "imageOptions": {
+          "type": "object",
+          "required": ["path"],
+          "properties": {
+            "path": {
+              "type": "string",
+              "pattern": "^https?:\\/{2}.+$"
             }
           }
         }
