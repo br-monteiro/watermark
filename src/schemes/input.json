@@ -1,0 +1,93 @@
+{
+  "type": "object",
+  "required": ["id", "baseImagePath", "feedbackUrl", "watermarkOptions", "position"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 3
+    },
+    "baseImagePath": {
+      "type": "string",
+      "pattern": "^https?:\\/{2}.+$"
+    },
+    "feedbackUrl": {
+      "type": "string",
+      "pattern": "^https?:\\/{2}.+$"
+    },
+    "watermarkOptions": {
+      "type": "object",
+      "required": ["type", "details"],
+      "properties": {
+        "type": {
+          "enum": ["text", "image"]
+        }
+      },
+      "if": {
+        "properties": {
+          "type": {
+            "const": "text"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "details": {
+            "type": "object",
+            "required": ["text", "size", "color"],
+            "properties": {
+              "text": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 100
+              },
+              "size": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "color": {
+                "type": "string",
+                "pattern": "^#[A-F0-9]{6}$"
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "details": {
+            "type": "object",
+            "required": ["path"],
+            "properties": {
+              "path": {
+                "type": "string",
+                "pattern": "^https?:\\/{2}.+$"
+              }
+            }
+          }
+        }
+      }
+    },
+    "position": {
+      "type": "object",
+      "required": ["x", "y", "height", "width"],
+      "properties": {
+        "x": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "y": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}
