@@ -5,19 +5,19 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
 -- -----------------------------------------------------
--- Schema queue_processor
+-- Schema artesup
 -- -----------------------------------------------------
 
 -- -----------------------------------------------------
--- Schema queue_processor
+-- Schema artesup
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `queue_processor` DEFAULT CHARACTER SET utf8 ;
-USE `queue_processor` ;
+CREATE SCHEMA IF NOT EXISTS `artesup` DEFAULT CHARACTER SET utf8 ;
+USE `artesup` ;
 
 -- -----------------------------------------------------
--- Table `queue_processor`.`queue`
+-- Table `artesup`.`queue`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `queue_processor`.`queue` (
+CREATE TABLE IF NOT EXISTS `artesup`.`queue` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `item_id` VARCHAR(45) NOT NULL,
   `status` VARCHAR(10) NOT NULL DEFAULT 'queued',
