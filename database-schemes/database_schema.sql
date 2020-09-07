@@ -19,16 +19,22 @@ USE `queue_processor` ;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `queue_processor`.`queue` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `status` VARCHAR(10) NOT NULL DEFAULT 'queued' COMMENT 'The status should be: error, processing, processed, queued',
-  `itemId` VARCHAR(20) NOT NULL COMMENT 'The id of Item',
-  `groupId` VARCHAR(20) NOT NULL COMMENT 'The Campaign id',
+  `item_id` VARCHAR(45) NOT NULL,
+  `status` VARCHAR(10) NOT NULL DEFAULT 'queued',
   `feedback_url` TEXT NOT NULL,
-  `type` VARCHAR(5) NOT NULL DEFAULT 'text',
-  `imageId` VARCHAR(20) NOT NULL COMMENT 'the image id',
-  `content` TEXT NOT NULL DEFAULT '{}' COMMENT 'The JSON value',
-  `attempt` INT(2) NULL DEFAULT 0 COMMENT 'The number of attempts of processor',
-  `created_at` DATETIME NULL,
-  `updated_at` DATETIME NULL,
+  `base_image_path` TEXT NOT NULL,
+  `type` VARCHAR(5) NOT NULL,
+  `details_text` VARCHAR(100) NULL,
+  `details_size` INT(2) NULL,
+  `details_color` VARCHAR(6) NULL,
+  `details_path` TEXT NULL,
+  `position_x` INT(5) NOT NULL,
+  `position_y` INT(5) NOT NULL,
+  `position_height` INT(5) NOT NULL,
+  `position_width` INT(5) NOT NULL,
+  `attempt` INT(2) NOT NULL,
+  `created_at` DATETIME NOT NULL,
+  `updated_at` DATETIME NOT NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
