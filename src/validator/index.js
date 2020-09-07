@@ -1,4 +1,4 @@
-const { Validator } = require('jsonschema')
+const Ajv = require('ajv')
 const { SchemaValidator } = require('./SchemaValidator')
 
-exports.validator = new SchemaValidator(new Validator())
+exports.validator = new SchemaValidator(new Ajv({ allErrors: true }))

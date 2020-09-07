@@ -1,7 +1,7 @@
 /**
  * @typedef InputSchemaError
  * @property { String } message
- * @property { String | Number | Object } input
+ * @property { String } path
  */
 
 class SchemaValidator {
@@ -18,8 +18,8 @@ class SchemaValidator {
     return this._errors
       .map(error => {
         return {
-          message: error.stack,
-          input: error.instance
+          message: error.message,
+          path: error.dataPath
         }
       })
   }
@@ -31,8 +31,12 @@ class SchemaValidator {
    * @return { Boolean }
    */
   validate (input, schema) {
-    this._errors = this._engine.validate(input, schema).errors
-    return this._errors.length === 0
+    const validate = this._engine.compile(schema)
+    const isValid = validate(input)
+
+    this._errors = !isValid ? validate.errors : []
+
+    return isValid
   }
 }
 
