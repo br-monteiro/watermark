@@ -22,8 +22,8 @@ describe('ValidatorSchema', () => {
 
     const errors = validator.getErrors()
     const expected = [{
-      message: 'instance is not of a type(s) integer',
-      input: 'jewjdjw djwd'
+      message: 'should be integer',
+      path: ''
     }]
 
     assert.equal('function', typeof validator.getErrors)
