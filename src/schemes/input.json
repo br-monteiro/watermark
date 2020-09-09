@@ -1,6 +1,6 @@
 {
   "type": "object",
-  "required": ["id", "baseImagePath", "feedbackUrl", "watermarkOptions", "position"],
+  "required": ["id", "baseImagePath", "feedbackUrl", "watermarkOptions", "positions"],
   "properties": {
     "id": {
       "type": "string",
@@ -8,7 +8,7 @@
     },
     "baseImagePath": {
       "type": "string",
-      "pattern": "^https?:\\/{2}.+$"
+      "pattern": "([\\w-_]+?\\/)+[\\w-_]+\\..+$"
     },
     "feedbackUrl": {
       "type": "string",
@@ -60,14 +60,14 @@
             "properties": {
               "path": {
                 "type": "string",
-                "pattern": "^https?:\\/{2}.+$"
+                "pattern": "([\\w-_]+?\\/)+[\\w-_]+\\..+$"
               }
             }
           }
         }
       }
     },
-    "position": {
+    "positions": {
       "type": "object",
       "required": ["x", "y", "height", "width"],
       "properties": {
