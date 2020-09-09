@@ -9,8 +9,8 @@ describe('JSON Schemes - input', () => {
     data = {
       id: '199299',
       feedbackUrl: 'https://teste.com',
-      baseImagePath: 'https://teste.com/',
-      position: {
+      baseImagePath: 'images/bucket-name/test.png',
+      positions: {
         x: 370,
         y: 470,
         height: 80,
@@ -37,7 +37,7 @@ describe('JSON Schemes - input', () => {
     data.watermarkOptions = {
       type: 'image',
       details: {
-        path: 'https://teste.com/'
+        path: 'images/bucket-name/test.png'
       }
     }
 
