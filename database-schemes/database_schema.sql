@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `artesup`.`queue` (
   `type` VARCHAR(5) NOT NULL,
   `details_text` VARCHAR(100) NULL,
   `details_size` INT(2) NULL,
-  `details_color` VARCHAR(6) NULL,
+  `details_color` VARCHAR(7) NULL,
   `details_path` TEXT NULL,
   `position_x` INT(5) NOT NULL,
   `position_y` INT(5) NOT NULL,
