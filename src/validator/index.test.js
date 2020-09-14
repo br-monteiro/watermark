@@ -12,9 +12,9 @@ describe('ValidatorSchema', () => {
   })
 
   it('validate', () => {
-    assert.equal('function', typeof validator.validate)
-    assert.equal(false, validator.validate('jewjdjw djwd', schema))
-    assert.equal(true, validator.validate(7, schema))
+    assert.strictEqual('function', typeof validator.validate)
+    assert.strictEqual(false, validator.validate('jewjdjw djwd', schema))
+    assert.strictEqual(true, validator.validate(7, schema))
   })
 
   it('getErrors', () => {
@@ -26,11 +26,11 @@ describe('ValidatorSchema', () => {
       path: ''
     }]
 
-    assert.equal('function', typeof validator.getErrors)
-    assert.equal(true, Array.isArray(errors))
-    assert.deepEqual(errors, expected)
+    assert.strictEqual('function', typeof validator.getErrors)
+    assert.strictEqual(true, Array.isArray(errors))
+    assert.deepStrictEqual(errors, expected)
 
     validator.validate(7, schema)
-    assert.deepEqual([], validator.getErrors())
+    assert.deepStrictEqual([], validator.getErrors())
   })
 })

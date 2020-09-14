@@ -30,7 +30,7 @@ describe('JSON Schemes - input', () => {
       }
     }
 
-    assert.equal(true, validator.validate(data, schema))
+    assert.strictEqual(true, validator.validate(data, schema))
   })
 
   it('type image', () => {
@@ -41,6 +41,6 @@ describe('JSON Schemes - input', () => {
       }
     }
 
-    assert.equal(true, validator.validate(data, schema))
+    assert.strictEqual(true, validator.validate(data, schema))
   })
 })

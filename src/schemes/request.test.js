@@ -17,6 +17,6 @@ describe('JSON Schemes - request', () => {
   })
 
   it('validate the "request.json" schema', () => {
-    assert.equal(true, validator.validate(data, schema))
+    assert.strictEqual(true, validator.validate(data, schema))
   })
 })

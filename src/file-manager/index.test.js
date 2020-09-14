@@ -3,17 +3,17 @@ const { fileExists, basename } = require('./')
 
 describe('file-manage', () => {
   it('fileExists', () => {
-    assert.equal(fileExists('.gitkeep'), true)
-    assert.equal(fileExists('testeteteste.jpg'), false)
-    assert.equal(fileExists(''), false)
-    assert.equal(fileExists(), false)
+    assert.strictEqual(fileExists('.gitkeep'), true)
+    assert.strictEqual(fileExists('testeteteste.jpg'), false)
+    assert.strictEqual(fileExists(''), false)
+    assert.strictEqual(fileExists(), false)
   })
 
   it('basename', () => {
-    assert.equal(basename('test.jpg'), 'test.jpg')
-    assert.equal(basename('teste/test.jpg'), 'test.jpg')
-    assert.equal(basename('test'), 'test')
-    assert.equal(basename(''), undefined)
-    assert.equal(basename(), undefined)
+    assert.strictEqual(basename('test.jpg'), 'test.jpg')
+    assert.strictEqual(basename('teste/test.jpg'), 'test.jpg')
+    assert.strictEqual(basename('test'), 'test')
+    assert.strictEqual(basename(''), undefined)
+    assert.strictEqual(basename(), undefined)
   })
 })
