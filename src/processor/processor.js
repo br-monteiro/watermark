@@ -65,6 +65,7 @@ async function initQueue (values) {
         result.details = validator
           .getErrors()
           .map(_ => ({ error: _.message }))
+        log.error(result.details, 'error to process item')
       } else {
         const isQueued = await insertQueueItem(item)
 
