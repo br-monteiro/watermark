@@ -1,9 +1,3 @@
-/**
- * @typedef InputSchemaError
- * @property { String } message
- * @property { String } path
- */
-
 class SchemaValidator {
   constructor (engine) {
     this._engine = engine
