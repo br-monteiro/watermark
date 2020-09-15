@@ -1,25 +1,26 @@
 /**
  * @typedef InputValue
- * @property { String } id
+ * @property { String } transactionId
  * @property { String } feedbackUrl
- * @property { String } baseImagePath
- * @property { InputValuePositions} positions
- * @property { InputValueOptions} watermarkOptions
+ * @property { String } watermarkPath
+ * @property { Array<ImageDetails> } images
  */
 
 /**
- * @typedef InputValuePositions
+ * @typedef ImageDetails
+ * @property { ImagePositions } positions
+ * @property { String } baseImagePath
+ * @property { String } s3ImagePath
+ */
+
+/**
+ * @typedef ImagePositions
  * @property { Number } x
  * @property { Number } y
  * @property { Number } height
  * @property { Number } width
  */
 
-/**
- * @typedef InputValueOptions
- * @property { 'text' | 'image' } type
- * @property { InputValueDetails } details
- */
 /**
  * @typedef InputValueDetails
  * @property { String } [text]
