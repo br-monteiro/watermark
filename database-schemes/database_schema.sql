@@ -24,9 +24,9 @@ USE `artesup` ;
 CREATE TABLE IF NOT EXISTS `artesup`.`queue` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `status` VARCHAR(10) NOT NULL DEFAULT 'queued',
+  `transaction_id` VARCHAR(45) NOT NULL,
   `feedback_url` VARCHAR(256) NOT NULL,
   `watermark_path` VARCHAR(256) NOT NULL,
-  `status` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `artesup`.`queue_items` (
   `s3_image_path` VARCHAR(256) NOT NULL,
   `details` TEXT NULL,
   PRIMARY KEY (`id`, `queue_id`),
-  INDEX `fk_queue_items_queue_idx` (`queue_id` ASC) VISIBLE,
+  INDEX `fk_queue_items_queue_idx` (`queue_id` ASC),
   CONSTRAINT `fk_queue_items_queue`
     FOREIGN KEY (`queue_id`)
     REFERENCES `artesup`.`queue` (`id`)
