@@ -41,7 +41,7 @@
  * @property { Array<QueueItemDetail> } [details]
  */
 
- /**
+/**
  * @typedef InputSchemaError
  * @property { String } message
  * @property { String } path
