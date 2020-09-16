@@ -32,6 +32,7 @@
 /**
  * @typedef QueueItemDetail
  * @param { String } error
+ * @param { String } path
  */
 
 /**

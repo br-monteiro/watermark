@@ -14,7 +14,7 @@ async function initQueue (values) {
   const promises = safeArray(values)
     .map(async item => {
       const result = {
-        id: item.id,
+        id: item.transactionId,
         status: 'queued'
       }
 
@@ -22,7 +22,8 @@ async function initQueue (values) {
         result.status = 'error'
         result.details = validator
           .getErrors()
-          .map(_ => ({ error: _.message }))
+          .map(_ => ({ error: _.message, path: _.path }))
+
         log.error(result.details, 'error to process item')
       } else {
         const isQueued = await insertQueueItem(item)
@@ -51,31 +52,36 @@ async function initQueue (values) {
  */
 async function insertQueueItem (item) {
   try {
-    const date = new Date()
+    return await knex.transaction(async trx => {
+      const ids = await knex('queue')
+        .insert({
+          status: 'queued',
+          transaction_id: item.transactionId,
+          feedback_url: item.feedbackUrl,
+          watermark_path: item.watermarkPath
+        }, 'id')
+        .transacting(trx)
 
-    await knex('queue')
-      .insert({
-        status: 'queued',
-        attempt: 1,
-        created_at: date,
-        updated_at: date,
-        item_id: item.id,
-        feedback_url: item.feedbackUrl,
-        base_image_path: item.baseImagePath,
-        type: item.watermarkOptions.type,
-        details_text: item.watermarkOptions.details.text,
-        details_size: item.watermarkOptions.details.size,
-        details_color: item.watermarkOptions.details.color,
-        details_path: item.watermarkOptions.details.path,
-        position_x: item.positions.x,
-        position_y: item.positions.y,
-        position_height: item.positions.height,
-        position_width: item.positions.width
-      })
+      await knex('queue_items')
+        .insert(item.images.map(image => {
+          return {
+            queue_id: ids[0],
+            status: 'queued',
+            position_x: image.positions.x,
+            position_y: image.positions.y,
+            position_height: image.positions.height,
+            position_width: image.positions.width,
+            base_image_path: image.baseImagePath,
+            s3_image_path: image.s3ImagePath,
+            details: ''
+          }
+        }))
+        .transacting(trx)
 
-    return true
+      return true
+    })
   } catch (error) {
-    log.error(error.sqlMessage, 'error to insert item into queue')
+    log.error(error.sqlMessage || error.message, 'error to insert item into queue')
     return false
   }
 }
