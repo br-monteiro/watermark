@@ -10,33 +10,37 @@ const s3 = require('./s3')
  * @return { Promise<Boolean> }
  */
 async function fetchFile (bucket, filename, destination) {
-  try {
-    if (!await fileExistsInS3(bucket, filename)) {
-      return false
-    }
-
-    const fileStream = fileManager.writeStream(destination)
-    const s3Stream = s3
-      .getObject({ Bucket: bucket, Key: filename })
-      .createReadStream()
-
-    s3Stream
-      .on('error', err => {
-        log.error(err, 'error occur while fetch file')
-      })
-
-    s3Stream
-      .pipe(fileStream)
-      .on('error', err => {
-        log.error(err, 'error occur while fetch file')
-      })
-      .on('close', async () => {
-        Promise.resolve(true)
-      })
-  } catch (error) {
-    log.error(error, 'error occur while fetch file')
-    return false
+  if (!await fileExistsInS3(bucket, filename)) {
+    return Promise.resolve(false)
   }
+
+  return new Promise(resolve => {
+    try {
+      const fileStream = fileManager.writeStream(destination)
+      const s3Stream = s3
+        .getObject({ Bucket: bucket, Key: filename })
+        .createReadStream()
+
+      s3Stream
+        .on('error', err => {
+          log.error(err, '[1]error occur while fetch file')
+          resolve(false)
+        })
+
+      s3Stream
+        .pipe(fileStream)
+        .on('error', err => {
+          log.error(err, '[2]error occur while fetch file')
+          resolve(false)
+        })
+        .on('close', async () => {
+          resolve(true)
+        })
+    } catch (error) {
+      log.error(error, '[3]error occur while fetch file')
+      resolve(false)
+    }
+  })
 }
 
 /**
@@ -62,7 +66,7 @@ async function fileExistsInS3 (bucket, filename) {
  * @return { Promise<Boolean> }
  */
 function saveOnBucket (bucket, filename) {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const uploadParams = { Bucket: bucket, Key: '', Body: '' }
     const fileStream = fileManager.readStream(filename)
 
