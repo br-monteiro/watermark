@@ -8,6 +8,28 @@ function safeArray (value) {
   return Array.isArray(value) ? value : []
 }
 
+/**
+ * Returns the details from URL
+ * @param { string } url - The URL
+ * @return { URLDetail }
+ */
+function getUrlDetails (url) {
+  if (!url || typeof url !== 'string') {
+    return
+  }
+
+  const { hostname, protocol, port, pathname, search } = new URL(url)
+
+  return {
+    hostname,
+    protocol,
+    port: Number(port) || 80,
+    pathname,
+    search
+  }
+}
+
 module.exports = {
-  safeArray
+  safeArray,
+  getUrlDetails
 }
