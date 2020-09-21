@@ -1,14 +1,14 @@
-
 const log = require('bole')('processor/processor')
 const knex = require('../database/knex')
+const http = require('http')
+const inputSchema = require('../schemes/input.json')
+
 const { validator } = require('../validator')
 const { safeArray, getUrlDetails } = require('../utils')
-const inputSchema = require('../schemes/input.json')
 const { createDirInStatic, fileExists, basename, pathname, buildThumbnailPath } = require('../file-manager')
 const { fetchFile, saveOnBucket } = require('../aws/bucket-manager')
 const { joinImges, makeThumbnail } = require('../image-processor')
 const { staticPaths } = require('../config')
-const http = require('http')
 
 /**
  * Init the queue to proccess
