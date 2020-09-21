@@ -73,16 +73,17 @@
 
 /**
  * @typedef FileDetails
+ * @property { String } rawValue
  * @property { String } bucket
  * @property { String } fullPath
+ * @property { String } fullPathThumbnail
  * @property { String } fileName
- * @property { Boolean } downloaded
- * @property { Boolean } uploaded
- * @property { String } details
  */
 
 /**
  * @typedef SynchronizedItem
+ * @property { Number } queueId
+ * @property { Number } queueItemId
  * @property { String } transactionId
  * @property { String } feedbackUrl
  * @property { FileDetails } watermark
@@ -94,4 +95,13 @@
  * @property { FileDetails } s3Image
  * @property { 'success' | 'error' } status
  * @property { Array<String> } details
+ */
+
+/**
+ * @typedef URLDetail
+ * @property { String } hostname
+ * @property { String } protocol
+ * @property { Number } port
+ * @property { String } pathname
+ * @property { String } search
  */
