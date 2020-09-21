@@ -37,7 +37,7 @@
 
 /**
  * @typedef QueueItem
- * @property { String } id
+ * @property { String } transactionId
  * @property { 'queued' | 'error' } status
  * @property { Array<QueueItemDetail> } [details]
  */

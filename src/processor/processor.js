@@ -19,7 +19,7 @@ async function initQueue (values) {
   const promises = safeArray(values)
     .map(async item => {
       const result = {
-        id: item.transactionId,
+        transactionId: item.transactionId,
         status: 'queued'
       }
 
@@ -125,7 +125,9 @@ async function initProcessor (forceProcess = false, queueStatus = 'queued', queu
 
     return result
   }))
-    .then(data => messenger(data[0]))
+    .then(data => {
+      data.forEach(item => messenger(item))
+    })
     .catch(error => {
       log.error(error.message, 'error to process queue')
     })
