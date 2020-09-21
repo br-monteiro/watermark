@@ -125,7 +125,7 @@ async function initProcessor (forceProcess = false, queueStatus = 'queued', queu
 
     return result
   }))
-    .then(data => messenger(data.map(item => item[0])))
+    .then(data => messenger(data[0]))
     .catch(error => {
       log.error(error.message, 'error to process queue')
     })
