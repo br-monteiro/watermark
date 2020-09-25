@@ -1,4 +1,8 @@
 /**
+ * @typedef { 'queued' | 'error' | 'processing' | 'processed' } Status
+ */
+
+/**
  * @typedef InputValue
  * @property { String } transactionId
  * @property { String } feedbackUrl
@@ -51,7 +55,7 @@
 /**
  * @typedef QueueDatabaseRow
  * @property { Number } id
- * @property { 'queued' | 'processing' | 'processed' | 'error' } status
+ * @property { Status } status
  * @property { String } transaction_id
  * @property { String } feedback_url
  * @property { String } watermark_path
@@ -61,7 +65,7 @@
  * @typedef QueueItemsDatabaseRow
  * @property { Number } id
  * @property { Number } queue_id
- * @property { 'queued' | 'processing' | 'processed' | 'error' } status
+ * @property { Status } status
  * @property { Number } position_x
  * @property { Number } position_y
  * @property { Number } position_height

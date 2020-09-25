@@ -4,11 +4,10 @@ const http = require('http')
 const inputSchema = require('../schemes/input.json')
 
 const { validator } = require('../validator')
-const { safeArray, getUrlDetails } = require('../utils')
-const { createDirInStatic, fileExists, basename, pathname, buildThumbnailPath } = require('../file-manager')
+const { safeArray, getUrlDetails, buildSynchronizedItem } = require('../utils')
+const { createDirInStatic, fileExists } = require('../file-manager')
 const { fetchFile, saveOnBucket } = require('../aws/bucket-manager')
 const { joinImges, makeThumbnail } = require('../image-processor')
-const { staticPaths } = require('../config')
 
 /**
  * Init the queue to proccess
@@ -16,6 +15,9 @@ const { staticPaths } = require('../config')
  * @return { Array<Promise<QueueItem>> }
  */
 async function initQueue (values) {
+  /**
+   * @type { Array<Promise<QueueItem>> }
+   */
   const promises = safeArray(values)
     .map(async item => {
       const result = {
@@ -45,7 +47,9 @@ async function initQueue (values) {
   return Promise
     .all(promises)
     .then(data => {
-      initProcessor()
+      if (data.some(item => item.status === 'queued')) {
+        initProcessor()
+      }
       return data
     })
 }
@@ -94,10 +98,13 @@ async function insertQueueItem (item) {
 /**
  * Run the process of images
  * @param { boolean } forceProcess - Indicate whether the process will be forced
+ * @param { Status } queueStatus - The status value of queue
+ * @param { Status } queueItemStatus - The status value of queue_items
  */
 async function initProcessor (forceProcess = false, queueStatus = 'queued', queueItemStatus = 'queued') {
   let lastQueueId = null
   const queue = await knex('queue')
+    .limit(1)
     .where(knex.raw('?? = ?', ['queue.status', queueStatus]))
 
   Promise.all(queue.map(async queueItem => {
@@ -125,57 +132,16 @@ async function initProcessor (forceProcess = false, queueStatus = 'queued', queu
 
     return result
   }))
-    .then(data => {
+    .then(async data => {
       data.forEach(item => messenger(item))
+      // execute the process until returns a empty list to process
+      if (data.length) {
+        await initProcessor()
+      }
     })
     .catch(error => {
       log.error(error.message, 'error to process queue')
     })
-}
-
-/**
- * Build the FileDetials object
- * @param { string } value - The path of file
- * @param { strint } basePath - The base path
- * @return { FileDetails }
- */
-function buildFileDatails (value, basePath = '') {
-  const baseName = basename(value)
-  const fullPath = `${basePath}${baseName}`
-  return {
-    rawValue: value,
-    bucket: pathname(value),
-    fullPath,
-    fullPathThumbnail: buildThumbnailPath(fullPath),
-    fileName: baseName
-  }
-}
-
-/**
- * Check if the all files was downloaded from S3.
- * If there's no file, performs a download of file from S3
- * @param { QueueDatabaseRow } queue - The item of queue
- * @param { Array<QueueItemsDatabaseRow>} queueItems - The items related of queue
- * @return { Array<SynchronizedItem> }
- */
-function buildSynchronizedItem (queue, queueItems) {
-  return queueItems.map(item => {
-    return {
-      queueId: queue.id,
-      queueItemId: item.id,
-      transactionId: queue.transaction_id,
-      feedbackUrl: queue.feedback_url,
-      x: item.position_x,
-      y: item.position_y,
-      height: item.position_height,
-      width: item.position_width,
-      status: 'success',
-      details: [],
-      watermark: buildFileDatails(queue.watermark_path, `${staticPaths.input}${queue.transaction_id}/`),
-      baseImage: buildFileDatails(item.base_image_path, `${staticPaths.input}${queue.transaction_id}/`),
-      s3Image: buildFileDatails(item.s3_image_path, `${staticPaths.output}${queue.transaction_id}/`)
-    }
-  })
 }
 
 /**
@@ -287,7 +253,7 @@ async function syncRemoteFiles (items) {
 /**
  * Changes the status to 'processing'
  * @param { Array<SynchronizedItem> } items - The items with pre-processing of synchronizer files
- * @param { 'queued' | 'error' | 'processing' | 'processed' } status - The status value
+ * @param { Status } status - The status value
  * @return { Array<SynchronizedItem> }
  */
 async function changesItemsStatus (items, status) {
@@ -299,7 +265,7 @@ async function changesItemsStatus (items, status) {
 
 /**
  * Dispatcher the messages to feedbackUrls
-@param { Array<SynchronizedItem> } items - The items with pre-processing of synchronizer files
+ * @param { Array<SynchronizedItem> } items - The items with pre-processing of synchronizer files
  */
 function messenger (items) {
   let lastQueueId = null
@@ -320,10 +286,10 @@ function messenger (items) {
  * Changes the status value in table name
  * @param { number } id - The id of register
  * @param { string } tableName - The table name
- * @param { 'queued' | 'error' | 'processing' | 'processed' } status - The status value
+ * @param { Status } status - The status value
  * @return { Promise<Boolean> }
  */
-async function asbtracChangeStatus (id, tableName, status) {
+async function abstractChangeStatus (id, tableName, status) {
   try {
     await knex(tableName)
       .where('id', '=', id)
@@ -339,21 +305,21 @@ async function asbtracChangeStatus (id, tableName, status) {
 /**
  * Changes the status of queue
  * @param { number } id - The id of register
- * @param { 'queued' | 'error' | 'processing' | 'processed' } status - The status value
+ * @param { Status } status - The status value
  * @return { Promise<Boolean> }
  */
 async function changeQueueStatus (id, status) {
-  return asbtracChangeStatus(id, 'queue', status)
+  return abstractChangeStatus(id, 'queue', status)
 }
 
 /**
  * Changes the status of queue_items
  * @param { number } id - The id of register
- * @param { 'queued' | 'error' | 'processing' | 'processed' } status - The status value
+ * @param { Status } status - The status value
  * @return { Promise<Boolean> }
  */
 async function changeQueueItemStatus (id, status) {
-  return asbtracChangeStatus(id, 'queue_items', status)
+  return abstractChangeStatus(id, 'queue_items', status)
 }
 
 /**
