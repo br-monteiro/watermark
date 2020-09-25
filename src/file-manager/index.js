@@ -3,7 +3,7 @@ const fs = require('fs')
 const path = require('path')
 
 /**
- * Check if the file exists in the static/input directory
+ * Check if the file exists
  * @param { string } filename - The file name
  * @return { Boolean }
  */
@@ -48,9 +48,9 @@ function readStream (filename) {
 }
 
 /**
- * Return the last portion of a path.
- * Similar to the Unix basename command.
- * Often used to extract the file name from a fully qualified path.
+ * Return the last portion of a path
+ * Similar to the Unix basename command
+ * Often used to extract the file name from a fully qualified path
  * @param { string } filename - The file name
  * @return { string }
  */
@@ -66,7 +66,7 @@ function basename (filename) {
  * @return { string }
  */
 function pathname (filename) {
-  if (typeof filename !== 'string') {
+  if (!filename || typeof filename !== 'string') {
     return
   }
 

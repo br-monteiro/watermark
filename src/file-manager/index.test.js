@@ -23,7 +23,7 @@ describe('file-manage', () => {
     assert.strictEqual(pathname('images/teste/'), 'images/teste/')
     assert.strictEqual(pathname('images/teste'), 'images/')
     assert.strictEqual(pathname('images/'), 'images/')
-    assert.strictEqual(pathname(''), '')
+    assert.strictEqual(pathname(''), undefined)
     assert.strictEqual(pathname(), undefined)
     assert.strictEqual(pathname(false), undefined)
     assert.strictEqual(pathname([]), undefined)
