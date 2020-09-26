@@ -88,6 +88,16 @@ function saveOnBucket (bucket, filename) {
   })
 }
 
+/**
+ * Returns the full path with bucket name
+ * @param { string } path - The path of resource
+ * @return { string }
+ */
+function getFullPath (path) {
+  const slash = !/\/$/.test(aws.bucket) ? '/' : ''
+  return `${aws.bucket}${slash}${path}`.replace(/\/$/, '')
+}
+
 module.exports = {
   fetchFile,
   saveOnBucket
