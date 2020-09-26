@@ -273,11 +273,13 @@ function messenger (items) {
     .forEach(async item => {
       if (item.status !== 'error') {
         await changeQueueItemStatus(item.queueItemId, 'processed')
-        if (lastQueueId !== item.queueId) {
-          await changeQueueStatus(item.queueId, 'processed')
-          lastQueueId = item.queueId
-        }
       }
+
+      if (lastQueueId !== item.queueId) {
+        await changeQueueStatus(item.queueId, 'processed')
+        lastQueueId = item.queueId
+      }
+
       dispatchMessage(item)
     })
 }
