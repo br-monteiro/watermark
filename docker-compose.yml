@@ -1,63 +1,25 @@
-# version: '3'
-# services:
-#   # db:
-#   #   image: mysql:5.7
-#   #   container_name: mysql-container
-#   #   volumes:
-#   #     - ./.data:/var/lib/mysql
-#   #     - ./database-schemes:/docker-entrypoint-initdb.d
-#   #   command: --default-authentication-plugin=mysql_native_password
-#   #   restart: always
-#   #   environment:
-#   #     MYSQL_ROOT_PASSWORD: webapp
-#   # api:
-#   #   image: node:10-alpine
-#   #   ports:
-#   #     - "3000:3000"
-#   #   container_name: node-container
-#   #   user: node
-#   #   working_dir: /home/node/app
-#   #   volumes:
-#   #     - .:/home/node/app
-#   #   command: npm start
-#   #   depends_on:
-#   #     - db
-#   app:
-#     image: node:10.20-alpine3.11
-#     container_name: app
-#     working_dir: /opt/app
-#     volumes:
-#       - .:/opt/app
-#     # depends_on:
-#     #   - db
-#     ports:
-#       - "3336:3336"
-#     entrypoint: "npm start"
-#     # env_file: .env
-#     environment:
-#       "NODE_ENV": "development"
-
-version: "3.1"
+version: "3.8"
 services:
-  # app:
-  #   image: node:10.20-alpine3.11
-  #   container_name: app
-  #   working_dir: /opt/app
-  #   volumes:
-  #     - .:/opt/app
-  #   depends_on:
-  #     - mysql
-  #   ports:
-  #     - "3336:3336"
-  #   entrypoint: "npm start"
-  #   env_file: .env
-  #   environment:
-  #     "EXPRESS_PORT": "3336"
-  #     "NODE_ENV": "development"
+  watermark:
+    build: .
+    container_name: watermark
+    working_dir: /opt/app
+    volumes:
+      - .:/opt/app
+      - /opt/app/node_modules
+    ports:
+      - "3000:3000"
+    entrypoint: "npm start"
+    env_file: .env
+    environment:
+      "EXPRESS_PORT": "3000"
+      "NODE_ENV": "development"
+    networks:
+      - backend
 
   mysql:
     image: mysql:5.7
-    container_name: mysql
+    container_name: watermark-mysql
     volumes:
       - ./.data:/var/lib/mysql
     restart: always
@@ -66,3 +28,9 @@ services:
     environment:
       "MYSQL_DATABASE": "${DB_DATABASE}"
       "MYSQL_ROOT_PASSWORD": "${DB_PASSWORD}"
+    networks:
+      - backend
+
+networks:
+  backend:
+    name: artesup_network
