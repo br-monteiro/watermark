@@ -63,6 +63,7 @@ function buildSynchronizedItem (queue, queueItems) {
       queueId: queue.id,
       queueItemId: item.id,
       transactionId: queue.transaction_id,
+      postId: item.post_id,
       feedbackUrl: queue.feedback_url,
       x: item.position_x,
       y: item.position_y,
