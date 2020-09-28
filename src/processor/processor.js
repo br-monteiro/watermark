@@ -76,6 +76,7 @@ async function insertQueueItem (item) {
           return {
             queue_id: ids[0],
             status: 'queued',
+            post_id: image.postId,
             position_x: image.positions.x,
             position_y: image.positions.y,
             position_height: image.positions.height,
@@ -268,20 +269,33 @@ async function changesItemsStatus (items, status) {
  * @param { Array<SynchronizedItem> } items - The items with pre-processing of synchronizer files
  */
 function messenger (items) {
-  let lastQueueId = null
-  items
-    .forEach(async item => {
-      if (item.status !== 'error') {
-        await changeQueueItemStatus(item.queueItemId, 'processed')
-      }
+  const processedBody = items.reduce(async (body, item) => {
+    if (!body[item.transactionId]) {
+      body[item.transactionId] = {}
+      await changeQueueStatus(item.queueId, 'processed')
+    }
 
-      if (lastQueueId !== item.queueId) {
-        await changeQueueStatus(item.queueId, 'processed')
-        lastQueueId = item.queueId
-      }
+    if (item.status !== 'error') {
+      await changeQueueItemStatus(item.queueItemId, 'processed')
+    }
 
-      dispatchMessage(item)
+    body[item.transactionId] = {
+      transactionId: item.transactionId,
+      feedbackUrl: item.feedbackUrl,
+      images: body[item.transactionId].images || []
+    }
+
+    body[item.transactionId].images.push({
+      postId: item.postId,
+      status: item.status
     })
+
+    return body
+  }, {})
+
+  processedBody
+    .then(data => dispatchMessage(Object.values(data)))
+    .catch((_) => log.error(_, 'Could not dispatch the message to feedbackURL'))
 }
 
 /**
@@ -326,36 +340,36 @@ async function changeQueueItemStatus (id, status) {
 
 /**
  * Try to performs a request to feedbackURL
- * @param { SynchronizedItem } item
+ * @param { Array<ProcessedBody> } items
  */
-function dispatchMessage (item) {
-  const data = JSON.stringify({
-    queueId: item.queueId,
-    queueItemId: item.queueItemId,
-    status: item.status,
-    s3ImagePath: item.s3Image.rawValue,
-    details: item.details
-  })
+function dispatchMessage (items) {
+  items.forEach(item => {
+    const feedbackURL = item.feedbackUrl
+    delete item.feedbackUrl
 
-  const urlDetails = getUrlDetails(item.feedbackUrl)
+    const data = JSON.stringify(item)
+    const urlDetails = getUrlDetails(feedbackURL)
 
-  const options = {
-    hostname: urlDetails.hostname,
-    port: urlDetails.port,
-    path: `${urlDetails.pathname}${urlDetails.search}`,
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': data.length
+    const options = {
+      hostname: urlDetails.hostname,
+      port: urlDetails.port,
+      path: `${urlDetails.pathname}${urlDetails.search}`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': data.length
+      }
     }
-  }
 
-  const req = http.request(options)
-  req.on('error', (error) => {
-    log.error(error, 'Error: could not be fire a request')
+    const req = http.request(options)
+
+    req.on('error', (error) => {
+      log.error(error, 'Error: could not be fire a request')
+    })
+
+    req.write(data)
+    req.end()
   })
-  req.write(data)
-  req.end()
 }
 
 module.exports = {
