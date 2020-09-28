@@ -13,6 +13,7 @@
 /**
  * @typedef ImageDetails
  * @property { ImagePositions } positions
+ * @property { String } postId
  * @property { String } baseImagePath
  * @property { String } s3ImagePath
  */
@@ -70,6 +71,7 @@
  * @property { Number } position_y
  * @property { Number } position_height
  * @property { Number } position_width
+ * @property { String } post_id
  * @property { String } base_image_path
  * @property { String } s3_image_path
  * @property { String } details
@@ -89,6 +91,7 @@
  * @property { Number } queueId
  * @property { Number } queueItemId
  * @property { String } transactionId
+ * @property { String } postId
  * @property { String } feedbackUrl
  * @property { FileDetails } watermark
  * @property { Number } x
@@ -108,4 +111,17 @@
  * @property { Number } port
  * @property { String } pathname
  * @property { String } search
+ */
+
+/**
+ * @typedef ProcessedBody
+ * @property { String } transactionId
+ * @property { String } feedbackUrl
+ * @property { Array<ProcessedBodyImages> } images
+ */
+
+/**
+ * @typedef ProcessedBodyImages
+ * @property { String } postId
+ * @property { 'success' | 'error' } status
  */
