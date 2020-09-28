@@ -18,6 +18,7 @@ describe('JSON Schemes - input', () => {
             height: 80,
             width: 150
           },
+          postId: 'dnunnub38334by3b34r',
           baseImagePath: 'images/bucket-name/background.png',
           s3ImagePath: 'images/bucket-name/background-processed.png'
         }
