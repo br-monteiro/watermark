@@ -19,7 +19,7 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["positions", "baseImagePath", "s3ImagePath"],
+        "required": ["positions", "postId", "baseImagePath", "s3ImagePath"],
         "properties": {
           "positions": {
             "type": "object",
@@ -42,6 +42,10 @@
                 "minimum": 0
               }
             }
+          },
+          "postId": {
+            "type": "string",
+            "minLength": 3
           },
           "baseImagePath": {
             "type": "string",
