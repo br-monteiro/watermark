@@ -117,11 +117,11 @@
  * @typedef ProcessedBody
  * @property { String } transactionId
  * @property { String } feedbackUrl
- * @property { Array<ProcessedBodyImages> } images
+ * @property { Array<ProcessedBodyImage> } images
  */
 
 /**
- * @typedef ProcessedBodyImages
+ * @typedef ProcessedBodyImage
  * @property { String } postId
  * @property { 'success' | 'error' } status
  */
