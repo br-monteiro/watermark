@@ -9,8 +9,8 @@
   "scripts": {
     "test": "mocha --recursive \"src/**/*.test.js\"",
     "watch:test": "npm run test -- --watch",
-    "lint": "./node_modules/.bin/eslint src/**/*.js",
-    "start": "./src/server.js"
+    "lint": "node ./node_modules/.bin/eslint src/**/*.js",
+    "start": "node ./src/server.js"
   },
   "repository": {
     "type": "git",
