@@ -2,7 +2,7 @@
   "name": "watermark",
   "version": "1.0.0",
   "description": "Watermark lib",
-  "main": "./src/server",
+  "main": "./src/server.js",
   "directories": {
     "test": "test"
   },
