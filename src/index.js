@@ -8,6 +8,6 @@ app.use(bodyParser.json())
 
 app.use('/api/v1', require('./processor/router'))
 
-app.get('/api/v1/status', (_, res) => res.send("we're working"))
+app.use('/api/v1', require('./application-status/router'))
 
 module.exports = app
