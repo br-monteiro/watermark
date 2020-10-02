@@ -1,8 +1,8 @@
 const config = require('../config')
 const env = config.env.PRD ? 'production' : 'development'
 
-console.log('environment db', env)
-console.log(config.knex)
+console.log('environment-db:', env)
+console.log(config.knex[env])
 
 const knex = require('knex')(config.knex[env])
 
