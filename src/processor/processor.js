@@ -294,7 +294,7 @@ function messenger (items) {
   }, {})
 
   processedBody
-    .then(data => dispatchMessage(Object.values(data)))
+    .then(data => updateItemsStatus(Object.values(data)))
     .catch((_) => log.error(_, 'Could not dispatch the message to feedbackURL'))
 }
 
@@ -369,6 +369,40 @@ function dispatchMessage (items) {
 
     req.write(data)
     req.end()
+  })
+}
+
+/**
+ * Update items status direct in database
+ * @param { Array<ProcessedBody> } items
+ */
+function updateItemsStatus (items) {
+  items.forEach(async item => {
+    const trx = await knex.transaction()
+    try {
+      let purchaseStatus = 'success'
+      const updatePurchaseStatus = item.images.map(item => {
+        if (item.status === 'error') {
+          purchaseStatus = 'error'
+        }
+
+        return trx('Purchase_posts')
+          .where({ id: item.postId })
+          .update({ watermark_status: item.status })
+      })
+
+      const purchaseUpdate = trx('Purchases')
+        .where({ id: item.transactionId })
+        .update({ watermark_status: purchaseStatus })
+
+      updatePurchaseStatus.push(purchaseUpdate)
+
+      await Promise.all(updatePurchaseStatus)
+      trx.commit()
+    } catch (err) {
+      log.error(err)
+      trx.rollback()
+    }
   })
 }
 
