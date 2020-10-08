@@ -1,4 +1,4 @@
-const gm = require('gm').subClass({ imageMagick: true })
+const sharp = require('sharp')
 const log = require('bole')('image-processor')
 
 /**
@@ -9,30 +9,29 @@ const log = require('bole')('image-processor')
  * @param { ImagePositions } positions - The positions to join the image 'B'
  * @return { Promise<Boolean> }
  */
-function joinImges (imageA, imageB, destination, positions) {
-  return new Promise(resolve => {
-    if (
-      !imageA ||
-      !imageB ||
-      !destination ||
-      !positions
-    ) {
-      log.error('error with parameters')
-      resolve(false)
-      return
-    }
+async function joinImges (imageA, imageB, destination, positions) {
+  if (
+    !imageA ||
+    !imageB ||
+    !destination ||
+    !positions
+  ) {
+    log.error('error with parameters')
+    return false
+  }
 
-    gm(imageA)
-      .draw([`image over ${positions.x},${positions.y}  ${positions.width},${positions.height} "${imageB}"`])
-      .write(destination, async error => {
-        if (error) {
-          log.error(error, 'error to processing image')
-          resolve(false)
-          return
-        }
-        resolve(true)
-      })
-  })
+  return sharp(imageA)
+    .composite([{
+      input: imageB,
+      top: positions.y,
+      left: positions.x
+    }])
+    .toFile(destination)
+    .then(() => true)
+    .catch(error => {
+      log.error(error, 'Error to processing images')
+      return false
+    })
 }
 
 /**
@@ -45,19 +44,14 @@ function joinImges (imageA, imageB, destination, positions) {
  * @return { Promise<Boolean> }
  */
 async function makeThumbnail (origin, destination, width = 300, height = 300, quality = 70) {
-  try {
-    gm(origin)
-      .thumb(width, height, destination, quality, (error) => {
-        if (error) {
-          log.error(error, `Error: could not process thumnail: ${origin}`)
-          Promise.resolve(false)
-        }
-        Promise.resolve(true)
-      })
-  } catch (_) {
-    log.error(`Error: could not process thumnail: ${origin}`)
-    return false
-  }
+  return sharp(origin)
+    .resize(width, height)
+    .toFile(destination)
+    .then(() => true)
+    .catch(error => {
+      log.error(error, `Error: could not process thumnail: ${origin}`)
+      return false
+    })
 }
 
 module.exports = {
