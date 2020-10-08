@@ -1,10 +1,9 @@
 const log = require('bole')('processor/processor')
 const knex = require('../database/knex')
-const http = require('http')
 const inputSchema = require('../schemes/input.json')
 
 const { validator } = require('../validator')
-const { safeArray, getUrlDetails, buildSynchronizedItem } = require('../utils')
+const { safeArray, buildSynchronizedItem } = require('../utils')
 const { createDirInStatic, fileExists } = require('../file-manager')
 const { fetchFile, saveOnBucket } = require('../aws/bucket-manager')
 const { joinImges, makeThumbnail } = require('../image-processor')
@@ -103,46 +102,51 @@ async function insertQueueItem (item) {
  * @param { Status } queueItemStatus - The status value of queue_items
  */
 async function initProcessor (forceProcess = false, queueStatus = 'queued', queueItemStatus = 'queued') {
-  let lastQueueId = null
-  const queue = await knex('queue')
-    .limit(1)
-    .where(knex.raw('?? = ?', ['queue.status', queueStatus]))
+  let result = []
 
-  Promise.all(queue.map(async queueItem => {
-    const queueItems = await knex('queue_items')
-      .where(knex.raw(':status: = :statusValue AND :queueId: = :queueIdValue', {
-        status: 'queue_items.status',
-        statusValue: queueItemStatus,
-        queueId: 'queue_items.queue_id',
-        queueIdValue: queueItem.id
-      }))
+  try {
+    const queue = await knex('queue')
+      .first()
+      .where(knex.raw('?? = ?', ['queue.status', queueStatus]))
 
-    let result = buildSynchronizedItem(queueItem, queueItems)
+    if (queue && queue.id) {
+      const queueItems = await knex('queue_items')
+        .where(knex.raw(':status: = :statusValue AND :queueId: = :queueIdValue', {
+          status: 'queue_items.status',
+          statusValue: queueItemStatus,
+          queueId: 'queue_items.queue_id',
+          queueIdValue: queue.id
+        }))
 
-    // update status of queue
-    if (lastQueueId !== queueItem.id) {
-      await changeQueueStatus(queueItem.id, 'processing')
-      lastQueueId = queueItem.id
-    }
+      result = buildSynchronizedItem(queue, queueItems)
 
-    result = await changesItemsStatus(result, 'processing')
-    result = await syncLocalFiles(result, forceProcess)
-    result = await processImages(result)
-    result = await processImagesThumb(result)
-    result = await syncRemoteFiles(result)
-
-    return result
-  }))
-    .then(async data => {
-      data.forEach(item => messenger(item))
-      // execute the process until returns a empty list to process
-      if (data.length) {
-        await initProcessor()
+      if (result.length) {
+        await changeQueueStatus(queue.id, 'processing')
       }
-    })
-    .catch(error => {
-      log.error(error.message, 'error to process queue')
-    })
+
+      for (let i = 0; i < queueItems.length; i++) {
+        try {
+          result = await changesItemsStatus(result, 'processing')
+          result = await syncLocalFiles(result, forceProcess)
+          result = await processImages(result)
+          result = await processImagesThumb(result)
+          result = await syncRemoteFiles(result)
+        } catch (error) {
+          log.error(error.message, 'UNEXPECTED ERROR PROCESSING')
+          continue
+        }
+      }
+    }
+  } catch (error) {
+    log.error(error.message, 'error to process queue')
+  }
+
+  // execute the process until returns a empty list to process
+  if (result.length) {
+    messenger(result)
+    const verifiedQueueItemStatus = queueItemStatus !== 'processed' ? queueItemStatus : 'queued'
+    await initProcessor(forceProcess, queueStatus, verifiedQueueItemStatus)
+  }
 }
 
 /**
@@ -215,15 +219,13 @@ async function processImages (items) {
  * @return { Array<SynchronizedItem> }
  */
 async function processImagesThumb (items) {
-  return Promise.all(items.map(async item => {
-    if (item.status === 'error') {
-      return item
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].status !== 'error') {
+      await makeThumbnail(items[i].s3Image.fullPath, items[i].s3Image.fullPathThumbnail)
     }
+  }
 
-    await makeThumbnail(item.s3Image.fullPath, item.s3Image.fullPathThumbnail)
-
-    return item
-  })).then(data => data)
+  return items
 }
 
 /**
@@ -295,7 +297,7 @@ function messenger (items) {
 
   processedBody
     .then(data => updateItemsStatus(Object.values(data)))
-    .catch((_) => log.error(_, 'Could not dispatch the message to feedbackURL'))
+    .catch(error => log.error(error, 'Could not dispatch the message to feedbackURL'))
 }
 
 /**
@@ -336,40 +338,6 @@ async function changeQueueStatus (id, status) {
  */
 async function changeQueueItemStatus (id, status) {
   return abstractChangeStatus(id, 'queue_items', status)
-}
-
-/**
- * Try to performs a request to feedbackURL
- * @param { Array<ProcessedBody> } items
- */
-function dispatchMessage (items) {
-  items.forEach(item => {
-    const feedbackURL = item.feedbackUrl
-    delete item.feedbackUrl
-
-    const data = JSON.stringify(item)
-    const urlDetails = getUrlDetails(feedbackURL)
-
-    const options = {
-      hostname: urlDetails.hostname,
-      port: urlDetails.port,
-      path: `${urlDetails.pathname}${urlDetails.search}`,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': data.length
-      }
-    }
-
-    const req = http.request(options)
-
-    req.on('error', (error) => {
-      log.error(error, 'Error: could not be fire a request')
-    })
-
-    req.write(data)
-    req.end()
-  })
 }
 
 /**
